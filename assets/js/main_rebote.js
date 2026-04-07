@@ -20,6 +20,7 @@ window.addEventListener("load", function () {
     const btnNivel = document.getElementById("btnNivel");
     const txtNivel = document.getElementById("nivel");
     const contador = document.getElementById("contador");
+    const porcentajeTxt = document.getElementById("porcentaje");
 
     canvas.addEventListener("mousemove", function (e) {
 
@@ -52,15 +53,17 @@ window.addEventListener("load", function () {
 
     class Circle {
 
-        constructor() {
+        constructor(num) {
 
-            this.r = 15;
+            this.num = num;
+            this.r = 18;
 
             this.reset();
 
             this.alpha = 1;
             this.desaparecer = false;
             this.eliminado = false;
+            this.color = "blue";
         }
 
         reset() {
@@ -68,7 +71,7 @@ window.addEventListener("load", function () {
             this.x = Math.random() * W;
             this.y = H + Math.random() * 200;
 
-            this.dx = (Math.random() - 0.5) * 1;
+            this.dx = (Math.random() - 0.5) * 1.2;
             this.dy = -velocidad;
         }
 
@@ -79,9 +82,15 @@ window.addEventListener("load", function () {
             ctx.globalAlpha = this.alpha;
 
             ctx.beginPath();
-            ctx.fillStyle = "blue";
+            ctx.fillStyle = this.color;
             ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
             ctx.fill();
+
+            ctx.fillStyle = "white";
+            ctx.font = "14px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(this.num, this.x, this.y);
 
             ctx.restore();
         }
@@ -100,9 +109,11 @@ window.addEventListener("load", function () {
 
             let dist = Math.sqrt(dx * dx + dy * dy);
 
+            // CAMBIO DE COLOR CON MOUSE
             if (dist < this.r) {
-
-                ctx.fillStyle = "red";
+                this.color = "red";
+            } else {
+                this.color = "blue";
             }
 
             if (this.desaparecer) {
@@ -113,12 +124,12 @@ window.addEventListener("load", function () {
 
                     this.eliminado = true;
                     eliminados++;
-
                     this.desaparecer = false;
                 }
             }
 
-            if (this.y < -50 && !this.eliminado) {
+            // reaparece si no fue presionada
+            if (this.y < -40 && !this.eliminado) {
 
                 this.reset();
             }
@@ -135,7 +146,7 @@ window.addEventListener("load", function () {
 
         for (let i = 0; i < objetivo; i++) {
 
-            circulos.push(new Circle());
+            circulos.push(new Circle(i + 1));
         }
     }
 
@@ -147,6 +158,11 @@ window.addEventListener("load", function () {
 
         contador.textContent =
             "Eliminados: " + eliminados + " / " + objetivo;
+
+        let porcentaje = (eliminados / objetivo) * 100;
+
+        porcentajeTxt.textContent =
+            porcentaje.toFixed(0) + "%";
 
         if (eliminados >= objetivo) {
 
@@ -169,8 +185,6 @@ window.addEventListener("load", function () {
     }
 
     animar();
-
-    // ---------------- NIVEL ----------------
 
     window.siguienteNivel = function () {
 

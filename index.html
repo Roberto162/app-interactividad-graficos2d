@@ -41,39 +41,55 @@
 
   <div class="container py-4">
 
-<div class="game-panel text-center p-4 mb-4">
+   <div class="game-panel container-fluid p-3 mb-3">
 
-    <h4 class="text-info fw-bold">
-        🎮 Nivel <span id="nivel">1</span>
-    </h4>
+    <div class="row align-items-center text-center">
 
-    <div class="mt-3">
+        <div class="col-md-3">
 
-        <button id="btnNivel"
-                class="btn btn-game disabled"
-                onclick="siguienteNivel()">
+            <h5 class="text-info fw-bold m-0">
+                🎮 Nivel <span id="nivel">1</span>
+            </h5>
 
-            🔒 Siguiente Nivel
+        </div>
 
-        </button>
+        <div class="col-md-3">
+
+            <span id="contador" class="text-light">
+                Eliminados: 0 / 10
+            </span>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <span id="porcentaje" class="text-warning">
+                0%
+            </span>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <button id="btnNivel"
+                    class="btn btn-game disabled"
+                    onclick="siguienteNivel()">
+
+                🔒 Siguiente Nivel
+
+            </button>
+
+        </div>
 
     </div>
 
-    <div class="mt-3">
-
-        <span id="contador" class="text-light">
-            Eliminados: 0 / 10
-        </span>
-
-    </div>
-
-</div>
+   </div>
 </div>
 
     <!-- CANVAS -->
-    <div class="game-canvas-container text-center p-4">
+<div class="game-canvas-container text-center">
 
-  <canvas id="canvas"></canvas>
+    <canvas id="canvas"></canvas>
 
 </div>
 
