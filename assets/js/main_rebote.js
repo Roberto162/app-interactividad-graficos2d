@@ -6,18 +6,20 @@ window.addEventListener("load", function () {
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
 
-    const window_width = canvas.width;
-    const window_height = canvas.height;
+    const W = canvas.width;
+    const H = canvas.height;
 
     let mouseX = 0;
     let mouseY = 0;
 
-    let totalCirculos = 20;
-    let eliminados = 0;
     let nivel = 1;
-    let velocidadBase = 0.5;
+    let eliminados = 0;
+    let objetivo = 10;
+    let velocidad = 0.6;
 
-    // ---------------- MOUSE ----------------
+    const btnNivel = document.getElementById("btnNivel");
+    const txtNivel = document.getElementById("nivel");
+    const contador = document.getElementById("contador");
 
     canvas.addEventListener("mousemove", function (e) {
 
@@ -25,177 +27,167 @@ window.addEventListener("load", function () {
 
         mouseX = e.clientX - rect.left;
         mouseY = e.clientY - rect.top;
-
     });
 
     canvas.addEventListener("click", function () {
 
         circulos.forEach(c => {
 
-            let dx = mouseX - c.posX;
-            let dy = mouseY - c.posY;
+            if (!c.eliminado) {
 
-            let dist = Math.sqrt(dx * dx + dy * dy);
+                let dx = mouseX - c.x;
+                let dy = mouseY - c.y;
 
-            if (dist < c.radius) {
-                c.desaparecer = true;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < c.r) {
+
+                    c.desaparecer = true;
+                }
             }
 
         });
 
     });
 
-    // ---------------- CLASE ----------------
-
     class Circle {
 
-        constructor(x, y, radius, text, speed) {
+        constructor() {
 
-            this.posX = x;
-            this.posY = y;
-            this.radius = radius;
-            this.text = text;
+            this.r = 15;
 
-            this.speed = speed;
-            this.color = "blue";
-
-            this.dx = (Math.random() - 0.5) * 1.5;
-            this.dy = -speed;
+            this.reset();
 
             this.alpha = 1;
             this.desaparecer = false;
+            this.eliminado = false;
         }
 
-        draw(context) {
+        reset() {
 
-            context.save();
+            this.x = Math.random() * W;
+            this.y = H + Math.random() * 200;
 
-            context.globalAlpha = this.alpha;
-
-            context.beginPath();
-            context.fillStyle = this.color;
-            context.arc(this.posX, this.posY, this.radius, 0, Math.PI * 2);
-            context.fill();
-
-            context.fillStyle = "white";
-            context.textAlign = "center";
-            context.textBaseline = "middle";
-            context.fillText(this.text, this.posX, this.posY);
-
-            context.closePath();
-
-            context.restore();
+            this.dx = (Math.random() - 0.5) * 1;
+            this.dy = -velocidad;
         }
 
-        update(context) {
+        draw() {
 
-            // movimiento hacia arriba
-            this.posY += this.dy;
-            this.posX += this.dx;
+            ctx.save();
 
-            // movimiento aleatorio
-            this.dx += (Math.random() - 0.5) * 0.1;
+            ctx.globalAlpha = this.alpha;
 
-            // detectar mouse
-            let dx = mouseX - this.posX;
-            let dy = mouseY - this.posY;
+            ctx.beginPath();
+            ctx.fillStyle = "blue";
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+            ctx.fill();
 
-            let distancia = Math.sqrt(dx * dx + dy * dy);
+            ctx.restore();
+        }
 
-            if (distancia < this.radius) {
-                this.color = "red";
-            } else {
-                this.color = "blue";
+        update() {
+
+            if (this.eliminado) return;
+
+            this.x += this.dx;
+            this.y += this.dy;
+
+            this.dx += (Math.random() - 0.5) * 0.05;
+
+            let dx = mouseX - this.x;
+            let dy = mouseY - this.y;
+
+            let dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < this.r) {
+
+                ctx.fillStyle = "red";
             }
 
-            // desaparecer lentamente
             if (this.desaparecer) {
 
-                this.alpha -= 0.02;
+                this.alpha -= 0.03;
 
                 if (this.alpha <= 0) {
 
-                    this.alpha = 0;
-
-                    this.posY = -100;
-
+                    this.eliminado = true;
                     eliminados++;
 
                     this.desaparecer = false;
                 }
             }
 
-            this.draw(context);
+            if (this.y < -50 && !this.eliminado) {
+
+                this.reset();
+            }
+
+            this.draw();
         }
     }
-
-    // ---------------- CREAR ----------------
 
     let circulos = [];
 
-    function crearCirculos(cantidad) {
+    function crearNivel() {
 
         circulos = [];
 
-        for (let i = 0; i < cantidad; i++) {
+        for (let i = 0; i < objetivo; i++) {
 
-            let radius = 15;
-
-            let x = Math.random() * window_width;
-
-            let y = window_height + Math.random() * 300;
-
-            let speed = velocidadBase + (nivel * 0.3);
-
-            circulos.push(
-                new Circle(x, y, radius, i + 1, speed)
-            );
+            circulos.push(new Circle());
         }
     }
 
-    crearCirculos(totalCirculos);
+    crearNivel();
 
-    // ---------------- HUD ----------------
+    function actualizarHUD() {
 
-    function dibujarInfo() {
+        txtNivel.textContent = nivel;
 
-        ctx.fillStyle = "white";
-        ctx.font = "14px Arial";
+        contador.textContent =
+            "Eliminados: " + eliminados + " / " + objetivo;
 
-        let porcentaje = ((eliminados / totalCirculos) * 100).toFixed(1);
+        if (eliminados >= objetivo) {
 
-        ctx.fillText("Eliminados: " + eliminados, 10, 20);
-        ctx.fillText("Porcentaje: " + porcentaje + "%", 10, 40);
-        ctx.fillText("Nivel: " + nivel, 10, 60);
+            btnNivel.classList.remove("disabled");
+            btnNivel.classList.add("active");
 
-    }
-
-    // ---------------- ANIMACION ----------------
-
-    function update() {
-
-        requestAnimationFrame(update);
-
-        ctx.clearRect(0, 0, window_width, window_height);
-
-        circulos.forEach(c => {
-            c.update(ctx);
-        });
-
-        dibujarInfo();
-
-        // subir nivel cada 10 eliminados
-        if (eliminados >= nivel * 10) {
-
-            nivel++;
-
-            velocidadBase += 0.3;
-
-            crearCirculos(totalCirculos);
-
+            btnNivel.textContent = "🚀 Siguiente Nivel";
         }
     }
 
-    update();
+    function animar() {
+
+        requestAnimationFrame(animar);
+
+        ctx.clearRect(0, 0, W, H);
+
+        circulos.forEach(c => c.update());
+
+        actualizarHUD();
+    }
+
+    animar();
+
+    // ---------------- NIVEL ----------------
+
+    window.siguienteNivel = function () {
+
+        if (eliminados < objetivo) return;
+
+        nivel++;
+
+        velocidad += 0.4;
+
+        eliminados = 0;
+
+        btnNivel.classList.remove("active");
+        btnNivel.classList.add("disabled");
+
+        btnNivel.textContent = "🔒 Siguiente Nivel";
+
+        crearNivel();
+    };
 
 });

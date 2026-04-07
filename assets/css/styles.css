@@ -153,3 +153,34 @@ canvas {
         height: 260px;
     }
 }
+
+.btn-game {
+
+    background: #0dcaf0;
+    border: none;
+    color: black;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.btn-game:hover {
+
+    background: #00ffff;
+    transform: scale(1.05);
+}
+
+.btn-game.disabled {
+
+    background: gray;
+    color: white;
+    cursor: not-allowed;
+}
+
+.btn-game.active {
+
+    background: #00ff9c;
+    color: black;
+    box-shadow: 0 0 20px #00ff9c;
+}
