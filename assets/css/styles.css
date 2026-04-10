@@ -113,8 +113,11 @@ h2 {
 canvas {
 
     width: 100%;
-    height: 500px;
+
+    height: 65vh; /* ocupa solo el 65% de la pantalla */
+
     background: linear-gradient(#000000, #111111);
+
     border-radius: 10px;
 }
 /* ---------- FOOTER ---------- */
