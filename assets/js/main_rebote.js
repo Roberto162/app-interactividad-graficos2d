@@ -16,11 +16,17 @@ window.addEventListener("load", function () {
     let eliminados = 0;
     let objetivo = 10;
     let velocidad = 0.6;
+    let tiempo = 0;
+
+    const MAX_NIVELES = 5;
 
     const btnNivel = document.getElementById("btnNivel");
     const txtNivel = document.getElementById("nivel");
     const contador = document.getElementById("contador");
+    const barra = document.getElementById("barra");
+    const tiempoTxt = document.getElementById("tiempo");
     const porcentajeTxt = document.getElementById("porcentaje");
+    const pantallaFinal = document.getElementById("pantallaFinal");
 
     canvas.addEventListener("mousemove", function (e) {
 
@@ -42,7 +48,6 @@ window.addEventListener("load", function () {
                 let dist = Math.sqrt(dx * dx + dy * dy);
 
                 if (dist < c.r) {
-
                     c.desaparecer = true;
                 }
             }
@@ -51,19 +56,31 @@ window.addEventListener("load", function () {
 
     });
 
+    function colorPorNivel() {
+
+        const colores = [
+            "blue",
+            "green",
+            "yellow",
+            "orange",
+            "red"
+        ];
+
+        return colores[nivel - 1];
+    }
+
     class Circle {
 
         constructor(num) {
 
             this.num = num;
             this.r = 18;
-
             this.reset();
 
             this.alpha = 1;
             this.desaparecer = false;
             this.eliminado = false;
-            this.color = "blue";
+            this.color = colorPorNivel();
         }
 
         reset() {
@@ -109,11 +126,10 @@ window.addEventListener("load", function () {
 
             let dist = Math.sqrt(dx * dx + dy * dy);
 
-            // CAMBIO DE COLOR CON MOUSE
             if (dist < this.r) {
                 this.color = "red";
             } else {
-                this.color = "blue";
+                this.color = colorPorNivel();
             }
 
             if (this.desaparecer) {
@@ -128,9 +144,7 @@ window.addEventListener("load", function () {
                 }
             }
 
-            // reaparece si no fue presionada
             if (this.y < -40 && !this.eliminado) {
-
                 this.reset();
             }
 
@@ -152,26 +166,36 @@ window.addEventListener("load", function () {
 
     crearNivel();
 
-    function actualizarHUD() {
+    setInterval(() => {
 
-        txtNivel.textContent = nivel;
+        tiempo++;
 
-        contador.textContent =
-            "Eliminados: " + eliminados + " / " + objetivo;
+        tiempoTxt.textContent = "⏱ " + tiempo + "s";
 
-        let porcentaje = (eliminados / objetivo) * 100;
+    }, 1000);
 
-        porcentajeTxt.textContent =
-            porcentaje.toFixed(0) + "%";
+   function actualizarHUD() {
 
-        if (eliminados >= objetivo) {
+    txtNivel.textContent = nivel;
 
-            btnNivel.classList.remove("disabled");
-            btnNivel.classList.add("active");
+    contador.textContent =
+        eliminados + " / " + objetivo;
 
-            btnNivel.textContent = "🚀 Siguiente Nivel";
-        }
+    let porcentaje = (eliminados / objetivo) * 100;
+
+    barra.style.width = porcentaje + "%";
+
+    porcentajeTxt.textContent =
+        porcentaje.toFixed(0) + "%";
+
+    if (eliminados >= objetivo) {
+
+        btnNivel.classList.remove("disabled");
+        btnNivel.classList.add("active");
+
+        btnNivel.textContent = "🚀 Siguiente Nivel";
     }
+}
 
     function animar() {
 
@@ -190,11 +214,16 @@ window.addEventListener("load", function () {
 
         if (eliminados < objetivo) return;
 
+        if (nivel === MAX_NIVELES) {
+
+            pantallaFinal.style.display = "flex";
+            return;
+        }
+
         nivel++;
-
         velocidad += 0.4;
-
         eliminados = 0;
+        tiempo = 0;
 
         btnNivel.classList.remove("active");
         btnNivel.classList.add("disabled");
@@ -202,6 +231,11 @@ window.addEventListener("load", function () {
         btnNivel.textContent = "🔒 Siguiente Nivel";
 
         crearNivel();
+    };
+
+    window.reiniciarJuego = function () {
+
+        location.reload();
     };
 
 });
