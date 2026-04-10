@@ -17,6 +17,7 @@ window.addEventListener("load", function () {
     let objetivo = 10;
     let velocidad = 0.6;
     let tiempo = 0;
+    let tiempoTotal = 0;
 
     const MAX_NIVELES = 5;
 
@@ -27,6 +28,7 @@ window.addEventListener("load", function () {
     const tiempoTxt = document.getElementById("tiempo");
     const porcentajeTxt = document.getElementById("porcentaje");
     const pantallaFinal = document.getElementById("pantallaFinal");
+    const tiempoFinalTxt = document.getElementById("tiempoFinal");
 
     canvas.addEventListener("mousemove", function (e) {
 
@@ -168,11 +170,12 @@ window.addEventListener("load", function () {
 
     setInterval(() => {
 
-        tiempo++;
+    tiempo++;
+    tiempoTotal++;
 
-        tiempoTxt.textContent = "⏱ " + tiempo + "s";
+    tiempoTxt.textContent = "⏱ " + tiempo + "s";
 
-    }, 1000);
+}, 1000);
 
    function actualizarHUD() {
 
@@ -216,9 +219,12 @@ window.addEventListener("load", function () {
 
         if (nivel === MAX_NIVELES) {
 
-            pantallaFinal.style.display = "flex";
-            return;
-        }
+    tiempoFinalTxt.textContent = tiempoTotal + " segundos";
+
+    pantallaFinal.style.display = "flex";
+
+    return;
+}
 
         nivel++;
         velocidad += 0.4;
